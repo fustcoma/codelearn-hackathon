@@ -21,19 +21,21 @@ PROGRESS_INTERVAL = 30  # segons
 
 # ─── COLORS ───────────────────────────────────────────────────────────────────
 WHITE        = (255, 255, 255)
-CANVAS_MUTED = (249, 250, 251)
-GRAY_900     = ( 17,  24,  39)
-GRAY_700     = ( 55,  65,  81)
-GRAY_500     = (107, 114, 128)
-GRAY_400     = (156, 163, 175)
-GRAY_200     = (229, 231, 235)
-GRAY_100     = (243, 244, 246)
+CANVAS_MUTED = (245, 247, 250)
+GRAY_900     = ( 15,  23,  42)
+GRAY_700     = ( 40,  49,  70)
+GRAY_500     = ( 88, 100, 123)
+GRAY_400     = (144, 156, 179)
+GRAY_300     = (197, 205, 224)
+GRAY_200     = (224, 231, 248)
+GRAY_100     = (240, 244, 254)
+BLUE_700     = ( 18,  65, 143)
 BLUE_600     = ( 37,  99, 235)
 BLUE_50      = (239, 246, 255)
-BLACK        = (  0,   0,   0)
-RED_600      = (220,  38,  38)
+ORANGE_600   = (217, 115,  21)
+RED_600      = (203,  44,  41)
 GREEN_600    = ( 22, 163,  74)
-OVERLAY      = (  0,   0,   0, 160)
+OVERLAY      = (  0,   0,   0, 170)
 
 # ─── SERVIDOR ─────────────────────────────────────────────────────────────────
 BASE_URL = "http://fun.codelearn.cat/hackathon/game"
@@ -183,11 +185,14 @@ class PanellInvent:
         draw_text_lines(surface, d_lines, fonts["small"], GRAY_200,
                         x + padding, dy, 22)
 
-        # Any (opcional)
+        # Any / pregunta
         if self.mostrar_any:
-            any_txt = fonts["semibold"].render(
-                format_any(self.invent["any"]), True, BLUE_50)
-            surface.blit(any_txt, (x + padding, y + h - 56))
+            any_txt = fonts["year"].render(format_any(self.invent["any"]), True, BLUE_50)
+            surface.blit(any_txt, (x + padding, y + h - 100))
+        else:
+            any_txt = fonts["year"].render("?", True, BLUE_50)
+            qx = x + w - padding - any_txt.get_width()
+            surface.blit(any_txt, (qx, y + h - 100))
 
 # ─── PANTALLA MENÚ ────────────────────────────────────────────────────────────
 class MenuScreen:
@@ -395,19 +400,24 @@ class JocScreen:
         self.result_t    = 0
         self.finished    = False
         self.panel_w     = WIDTH // 2 - 40
-        self.panel_h     = HEIGHT - 140
+        self.panel_h     = HEIGHT - 220
         self.panel_y     = 90
 
-        self.btn_abans   = Button(WIDTH // 2 + 20, HEIGHT - 72,
-                                  (self.panel_w - 20) // 2, 48,
+        button_w      = 320
+        button_gap    = 24
+        button_total  = button_w * 2 + button_gap
+        button_x      = WIDTH // 2 - button_total // 2
+        button_y      = self.panel_y + self.panel_h + 18
+
+        self.btn_abans   = Button(button_x, button_y, button_w, 60,
                                   "← Abans", fonts["semibold"],
-                                  WHITE, GRAY_900, border=GRAY_200,
-                                  hover_bg=GRAY_100)
-        self.btn_despres = Button(WIDTH // 2 + 20 + (self.panel_w + 20) // 2, HEIGHT - 72,
-                                  (self.panel_w - 20) // 2, 48,
+                                  WHITE, GRAY_900, border=GRAY_300,
+                                  hover_bg=GRAY_200)
+        self.btn_despres = Button(button_x + button_w + button_gap, button_y,
+                                  button_w, 60,
                                   "Després →", fonts["semibold"],
-                                  BLUE_600, WHITE,
-                                  hover_bg=(29, 78, 216))
+                                  BLUE_700, WHITE,
+                                  hover_bg=(23, 64, 161))
 
         self._nou_torn()
 
@@ -520,11 +530,14 @@ class JocScreen:
         self.btn_despres.draw(surface)
 
         # Feedback breu
-        if self.result and time.time() - self.result_t < 1.2:
+        if self.result and time.time() - self.result_t < 1.4:
             color = GREEN_600 if self.result == "correcte" else RED_600
             text  = "✓ Correcte!" if self.result == "correcte" else "✗ Incorrecte!"
-            fb    = self.fonts["bold"].render(text, True, color)
-            surface.blit(fb, (WIDTH // 2 - fb.get_width() // 2, HEIGHT // 2 - 20))
+            fb    = self.fonts["feedback"].render(text, True, WHITE)
+            pill = fb.get_rect(center=(WIDTH // 2, HEIGHT // 2 - 24))
+            pill.inflate_ip(48, 26)
+            draw_rounded_rect(surface, color, pill, radius=28)
+            surface.blit(fb, fb.get_rect(center=pill.center))
 
 # ─── PANTALLA GAME OVER ───────────────────────────────────────────────────────
 class GameOverScreen:
@@ -536,10 +549,10 @@ class GameOverScreen:
         self.nom_dret = nom_dret
         self.inv_dret = inv_dret
         cx = WIDTH // 2
-        self.btn_restart = Button(cx - 200, 500, 180, 52,
+        self.btn_restart = Button(cx - 280, 500, 250, 72,
                                   "Tornar a jugar", fonts["semibold"],
                                   BLUE_600, WHITE, hover_bg=(29, 78, 216))
-        self.btn_menu    = Button(cx + 20, 500, 180, 52,
+        self.btn_menu    = Button(cx + 30, 500, 250, 72,
                                   "Menú principal", fonts["semibold"],
                                   WHITE, GRAY_900, border=GRAY_200,
                                   hover_bg=GRAY_100)
@@ -587,11 +600,16 @@ class GameOverScreen:
         self.btn_restart.draw(surface)
         self.btn_menu.draw(surface)
 
+        # Any gran per la comparació correcta/incorrecta
+        info_year = self.fonts["year"].render(
+            f"{format_any(self.inv_esq['any'])}  vs  {format_any(self.inv_dret['any'])}", True, BLUE_700)
+        surface.blit(info_year, (WIDTH // 2 - info_year.get_width() // 2, 410))
+
 # ─── INICIALITZACIÓ PYGAME ────────────────────────────────────────────────────
 def build_fonts():
-    """Construeix tots els f    onts del joc."""
-    # Intenta carregar Inter (si el sistema el té), sinó fa servir Arial
-    candidates = ["Inter", "Arial", "Helvetica", "DejaVu Sans", "FreeSans"]
+    """Construeix tots els fonts del joc."""
+    # Intenta carregar una font neta i llegible com Inter o Segoe UI
+    candidates = ["Inter", "Segoe UI", "Verdana", "Arial", "Helvetica", "DejaVu Sans", "FreeSans"]
     base = None
     for name in candidates:
         try:
@@ -602,18 +620,19 @@ def build_fonts():
         except Exception:
             continue
 
-    def f(size, bold=False):
-        return pygame.font.SysFont(base, size, bold=bold)
+    def f(size):
+        return pygame.font.SysFont(base, size, bold=False)
 
     return {
-        "title":    f(64, bold=True),
-        "bold":     f(36, bold=True),
-        "semibold": f(28, bold=True),
-        "body":     f(24),
-        "small":    f(20),
-        "meta":     f(18),
-}
-
+        "title":    f(90),
+        "bold":     f(54),
+        "semibold": f(44),
+        "body":     f(30),
+        "small":    f(26),
+        "meta":     f(24),
+        "year":     f(94),
+        "feedback": f(102),
+        "score":    f(64),
 # ─── BUCLE PRINCIPAL ──────────────────────────────────────────────────────────
 def main():
     pygame.init()

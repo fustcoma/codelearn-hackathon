@@ -117,6 +117,17 @@ def draw_text_lines(surface, lines, font, color, x, y, line_height):
         surf = font.render(line, True, color)
         surface.blit(surf, (x, y + i * line_height))
 
+
+def draw_gradient(surface):
+    top=(25,60,120)
+    bottom=(90,170,255)
+    for y in range(HEIGHT):
+        t=y/HEIGHT
+        r=int(top[0]*(1-t)+bottom[0]*t)
+        g=int(top[1]*(1-t)+bottom[1]*t)
+        b=int(top[2]*(1-t)+bottom[2]*t)
+        pygame.draw.line(surface,(r,g,b),(0,y),(WIDTH,y))
+
 # ─── BOTONS ───────────────────────────────────────────────────────────────────
 class Button:
     def __init__(self, x, y, w, h, text, font,
@@ -194,10 +205,10 @@ class MenuScreen:
     def __init__(self, fonts):
         self.fonts = fonts
         cx = WIDTH // 2
-        self.btn_joc = Button(cx - 160, 340, 320, 56,
+        self.btn_joc = Button(cx - 160, 340, 360, 72,
                               "Jugar",        fonts["semibold"],
                               BLUE_600, WHITE, hover_bg=(29, 78, 216))
-        self.btn_cro = Button(cx - 160, 416, 320, 56,
+        self.btn_cro = Button(cx - 160, 416, 360, 72,
                               "Cronologia",   fonts["semibold"],
                               WHITE, GRAY_900, border=GRAY_200,
                               hover_bg=GRAY_100)
@@ -210,7 +221,7 @@ class MenuScreen:
         return None
 
     def draw(self, surface):
-        surface.fill(WHITE)
+        draw_gradient(surface)
 
         # Línia separadora superior suau
         pygame.draw.line(surface, GRAY_200, (0, 60), (WIDTH, 60))
@@ -289,7 +300,7 @@ class CronologiaScreen:
         return None
 
     def draw(self, surface):
-        surface.fill(CANVAS_MUTED)
+        draw_gradient(surface)
         pygame.draw.line(surface, GRAY_200, (0, 60), (WIDTH, 60))
 
         # Títol
@@ -492,7 +503,7 @@ class JocScreen:
         return None
 
     def draw(self, surface):
-        surface.fill(CANVAS_MUTED)
+        draw_gradient(surface)
 
         # Capçalera
         pygame.draw.line(surface, GRAY_200, (0, 70), (WIDTH, 70))
@@ -536,10 +547,10 @@ class GameOverScreen:
         self.nom_dret = nom_dret
         self.inv_dret = inv_dret
         cx = WIDTH // 2
-        self.btn_restart = Button(cx - 200, 500, 180, 52,
+        self.btn_restart = Button(cx - 200, 500, 220, 64,
                                   "Tornar a jugar", fonts["semibold"],
                                   BLUE_600, WHITE, hover_bg=(29, 78, 216))
-        self.btn_menu    = Button(cx + 20, 500, 180, 52,
+        self.btn_menu    = Button(cx + 20, 500, 220, 64,
                                   "Menú principal", fonts["semibold"],
                                   WHITE, GRAY_900, border=GRAY_200,
                                   hover_bg=GRAY_100)
@@ -552,7 +563,7 @@ class GameOverScreen:
         return None
 
     def draw(self, surface):
-        surface.fill(WHITE)
+        draw_gradient(surface)
         pygame.draw.line(surface, GRAY_200, (0, 60), (WIDTH, 60))
 
         # Títol
@@ -589,7 +600,7 @@ class GameOverScreen:
 
 # ─── INICIALITZACIÓ PYGAME ────────────────────────────────────────────────────
 def build_fonts():
-    """Construeix tots els f    onts del joc."""
+    """Construeix tots els fonts del joc."""
     # Intenta carregar Inter (si el sistema el té), sinó fa servir Arial
     candidates = ["Inter", "Arial", "Helvetica", "DejaVu Sans", "FreeSans"]
     base = None
@@ -612,7 +623,7 @@ def build_fonts():
         "body":     f(24),
         "small":    f(20),
         "meta":     f(18),
-}
+    }
 
 # ─── BUCLE PRINCIPAL ──────────────────────────────────────────────────────────
 def main():

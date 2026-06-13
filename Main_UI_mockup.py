@@ -1,3 +1,4 @@
+# Versió UI inspirada en el mockup aportat per l'usuari
 # main.py
 import requests
 import random
@@ -536,10 +537,10 @@ class GameOverScreen:
         self.nom_dret = nom_dret
         self.inv_dret = inv_dret
         cx = WIDTH // 2
-        self.btn_restart = Button(cx - 200, 500, 180, 52,
+        self.btn_restart = Button(cx - 260, 500, 240, 70,
                                   "Tornar a jugar", fonts["semibold"],
                                   BLUE_600, WHITE, hover_bg=(29, 78, 216))
-        self.btn_menu    = Button(cx + 20, 500, 180, 52,
+        self.btn_menu    = Button(cx + 40, 500, 240, 70,
                                   "Menú principal", fonts["semibold"],
                                   WHITE, GRAY_900, border=GRAY_200,
                                   hover_bg=GRAY_100)
@@ -589,7 +590,7 @@ class GameOverScreen:
 
 # ─── INICIALITZACIÓ PYGAME ────────────────────────────────────────────────────
 def build_fonts():
-    """Construeix tots els f    onts del joc."""
+    """Construeix tots els fonts del joc."""
     # Intenta carregar Inter (si el sistema el té), sinó fa servir Arial
     candidates = ["Inter", "Arial", "Helvetica", "DejaVu Sans", "FreeSans"]
     base = None
